@@ -159,9 +159,9 @@ callgroup=1               ; For call pickup
 pickupgroup=1             ; For call pickup
 
 ```
-#### 4.2. `features.conf` (Call Transfer Codes)
+#### 4.2. `extensions.conf` (Dial Plan)
 
-This defines how calls are routed and enables the pickup feature. Ensure your extensions.conf has the following in the [sufi] context. Remember to use sudo nano /etc/asterisk/extensions.conf to edit.
+This defines how calls are routed and enables the pickup feature. Ensure your `extensions.conf` has the following in the `[sufi]` context. Remember to use `sudo nano /etc/asterisk/extensions.conf` to edit.
 
 ```ini
 [sufi]
@@ -175,9 +175,9 @@ exten => *8,1,Pickup()     ; Picks up any ringing call in the caller's pickupgro
 same => n,Hangup()
 
 ```
-#### 4.3. features.conf (Call Transfer Codes)
+#### 4.3. `features.conf` (Call Transfer Codes)
 
-This defines the DTMF codes for call transfer. Ensure these lines are uncommented or added under the [featuremap] section. Remember to use sudo nano /etc/asterisk/features.conf to edit.
+This defines the DTMF codes for call transfer. Ensure these lines are uncommented or added under the `[featuremap]` section. Remember to use `sudo nano /etc/asterisk/features.conf` to edit.
 
 ```ini
 [featuremap]
