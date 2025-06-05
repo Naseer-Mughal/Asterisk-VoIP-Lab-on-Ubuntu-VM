@@ -190,7 +190,7 @@ atxfer => *2
 
 ### 5. Reload Asterisk Configurations
 
-After making changes to .conf files, reload them in the Asterisk CLI:
+After making changes to `.conf` files, reload them in the Asterisk CLI:
 
 ```ini
 sip reload
@@ -204,9 +204,9 @@ features reload ; Note: 'features reload' might not be recognized, 'features sho
 Install Zoiper on your mobile and laptop. For each extension (100, 101, 102), configure Zoiper as follows:
 
 - Account Type: SIP
-- Hostname/Domain/Server: The IP address of your Ubuntu VM (e.g., 192.168.100.159)
-- Username: The extension number (e.g., 100, 101, 102)
-- Password: The secret defined in sip.conf for that extension.
+- Hostname/Domain/Server: The IP address of your Ubuntu VM (e.g., `192.168.100.159`)
+- Username: The extension number (e.g., `100`, `101`, `102`)
+- Password: The `secret` defined in `sip.conf` for that extension.
 - Transport: UDP
 - DTMF Mode: RFC 2833 (important for feature codes)
 
@@ -214,9 +214,9 @@ Ensure all Zoiper clients register successfully. Verify in Asterisk CLI:
 ```ini
 sip show peers
 
+```
 All peers should show `OK` status.
 
-```
 ### Testing the Features
 
 #### 1. Internal Calling
