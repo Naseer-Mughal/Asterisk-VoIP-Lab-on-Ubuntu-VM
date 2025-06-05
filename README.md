@@ -158,8 +158,12 @@ qualify=yes
 callgroup=1               ; For call pickup
 pickupgroup=1             ; For call pickup
 
-### 4. features.conf (Call Transfer Codes)
+```
+#### 4.2. `features.conf` (Call Transfer Codes)
 
+This defines how calls are routed and enables the pickup feature. Ensure your extensions.conf has the following in the [sufi] context. Remember to use sudo nano /etc/asterisk/extensions.conf to edit.
+
+```ini
 [sufi]
 ; Dialing internal extensions (e.g., 100, 101, 102)
 exten => _X.,1,NOOP(Call towards <span class="math-inline">\{EXTEN\}\)
@@ -169,3 +173,90 @@ same => n,Hangup()
 ; Call Pickup Feature Code
 exten => *8,1,Pickup()     ; Picks up any ringing call in the caller's pickupgroup (group 1)
 same => n,Hangup()
+
+```
+#### 4.3. features.conf (Call Transfer Codes)
+
+This defines the DTMF codes for call transfer. Ensure these lines are uncommented or added under the [featuremap] section. Remember to use sudo nano /etc/asterisk/features.conf to edit.
+
+```ini
+[featuremap]
+; Blind Transfer (default is '#')
+blindxfer => # 
+; Attended Transfer (default is '*2')
+atxfer => *2
+
+```
+
+### 5. Reload Asterisk Configurations
+
+After making changes to .conf files, reload them in the Asterisk CLI:
+
+```ini
+sip reload
+dialplan reload
+features reload ; Note: 'features reload' might not be recognized, 'features show' confirms active
+
+```
+
+### 6. Zoiper Softphone Configuration
+
+Install Zoiper on your mobile and laptop. For each extension (100, 101, 102), configure Zoiper as follows:
+
+- Account Type: SIP
+- Hostname/Domain/Server: The IP address of your Ubuntu VM (e.g., 192.168.100.159)
+- Username: The extension number (e.g., 100, 101, 102)
+- Password: The secret defined in sip.conf for that extension.
+- Transport: UDP
+- DTMF Mode: RFC 2833 (important for feature codes)
+
+Ensure all Zoiper clients register successfully. Verify in Asterisk CLI:
+```ini
+sip show peers
+
+All peers should show `OK` status.
+
+```
+### Testing the Features
+
+#### 1. Internal Calling
+
+- From Zoiper 100, dial 101.
+- Answer on 101. Verify two-way audio.
+  
+#### 2. Call Transfer (Blind Transfer using `#`)
+- **Scenario:** 100 calls 101. 101 transfers the call to 102.
+- From Zoiper 100, dial `101`.
+- Answer on Zoiper 101.
+- **On Zoiper 101 (during the active call):**
+  - Open the dial pad in Zoiper.
+  - Dial `#` (you should hear a dial tone from Asterisk).
+  - Dial `102`.
+  - Hang up Zoiper 101's call.
+- **Expected:** Zoiper 100 should now be connected to Zoiper 102.
+
+#### 3. Call Pickup (using `*8`)
+- **Scenario:** 100 calls 102 (ringing). 101 picks up the call.
+- From Zoiper 100, dial `102`.
+- Observe Zoiper 102 ringing.
+- **On Zoiper 101 (while 102 is ringing):**
+  - Dial `*8`.
+  - Press "Call" or "Send".
+- **Expected:** Zoiper 102 stops ringing, and Zoiper 101 connects to Zoiper 100.
+
+#### Troubleshooting Tips
+
+* **Check** `sip show peers:` Always ensure all Zoiper clients are registered (OK status).
+* **Asterisk CLI Debugging:** For detailed troubleshooting, use:
+
+```
+sudo asterisk -rvvv
+core set verbose 5
+sip set debug on
+```
+
+This will show all SIP traffic and Asterisk internal processing.
+
+- **Firewall:** Ensure your Ubuntu VM's firewall (UFW) is not blocking SIP (UDP 5060) or RTP (UDP 10000-20000) traffic. Temporarily disable with `sudo ufw disable` for testing, then configure rules and re-enable.
+- **Context Mismatch:** Double-check that the `context` in `sip.conf`'s `[general]` section and for each `[peer]` matches the context name in `extensions.conf` (e.g., `sufi`).
+- **DTMF Mode:** Ensure Zoiper is sending DTMF as `RFC 2833`.
